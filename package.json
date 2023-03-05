@@ -1,0 +1,38 @@
+{
+  "name": "scheduler-be",
+  "version": "1.0.0",
+  "description": "scheduler",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc -w & nodemon dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zhibul-Alexander/scheduler-be.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zhibul-Alexander/scheduler-be/issues"
+  },
+  "homepage": "https://github.com/Zhibul-Alexander/scheduler-be#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "eslint": "^8.22.0",
+    "eslint-plugin-react": "^7.32.2",
+    "nodemon": "^2.0.21"
+  }
+}
