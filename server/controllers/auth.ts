@@ -1,14 +1,26 @@
 import {Request, Response} from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import {v4 as uuidv4} from 'uuid';
+
+import nodemailer from 'nodemailer';
+import Mail from 'nodemailer/lib/mailer';
 
 import User from '../models/User.js';
+
+interface MailOptions {
+    from: string;
+    to: string;
+    subject: string;
+    text?: string;
+    html?: string;
+}
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const {email, password} = req.body;
 
-    const user = await User.findOne({email}); // ищим полученный email в базе данных
+    const user = await User.findOne({email});
     if (user) {
       res.status(400).json({message: 'Username is already taken'});
       return;
@@ -17,12 +29,11 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const salt: string = bcrypt.genSaltSync(10); // генерируем соль для хэширования
     const hash: string = bcrypt.hashSync(password, salt); // хэшируем пароль
 
-    const newUser = new User({ // добавляем нового пользователя в базу данных
+    const newUser = new User({
       email,
-      password: hash, // сохраняем хэш пароля в базу данных
+      password: hash,
     });
-
-    await newUser.save(); // сохраняем пользователя в базу данных
+    await newUser.save();
 
     res.json({
       newUser,
@@ -38,13 +49,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const {email, password} = req.body;
 
-    const user = await User.findOne({email}); // ищем пользователя в базе данных
+    const user = await User.findOne({email});
     if (!user) {
       res.status(400).json({message: 'User not found'});
       return;
     }
 
-    const isPasswordCorrect: boolean = await bcrypt.compare(password, user.password); // проверяем полученный пароль и пароль пользователя из базы данных
+    const isPasswordCorrect: boolean = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
       res.status(400).json({message: 'Incorrect password'});
       return;
@@ -62,6 +73,64 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       message: 'User logged in successfully',
     });
 
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const {email} = req.body;
+
+    const user = await User.findOne({email});
+    if (!user) {
+      res.status(400).json({message: 'User not found'});
+      return;
+    }
+
+    const resetToken = uuidv4();
+    user.resetPasswordToken = resetToken;
+    await user.save();
+
+    // const transporter = nodemailer.createTransport({
+    //   host: 1025,
+    //   port: process.env.EMAIL_PORT,
+    //   secure: false,
+    //   auth: {
+    //     user: process.env.EMAIL_LOGIN,
+    //     pass: process.env.EMAIL_PASSWORD,
+    //   },
+    // });
+    //
+    // const resetPasswordUrl = `${process.env.SERVER_PROTO}://${process.env.SERVER_URL}:${process.env.PORT}/forgot-password/${resetToken}`;
+    // const message: MailOptions = {
+    //   from: 'Scheduler <scheduler@gmail.com>',
+    //   to: user.email,
+    //   subject: 'Reset password',
+    //   html: `Hello,<br><br>You requested a password reset.<br><br>Use the link below to reset your password:<br><br><a href="${resetPasswordUrl}">${resetPasswordUrl}</a>`,
+    // };
+    //
+    // await transporter.sendMail(message);
+
+
+    const transporter: Mail = nodemailer.createTransport({
+      port: 1025,
+      ignoreTLS: true,
+    });
+
+    const resetPasswordUrl = `${process.env.SERVER_PROTO}://${process.env.SERVER_URL}:${process.env.PORT}/forgot-password/${resetToken}`;
+    const message: MailOptions = {
+      from: 'Scheduler <scheduler@gmail.com>',
+      to: user.email,
+      subject: 'Reset password',
+      html: `Hello,<br><br>You requested a password reset.<br><br>Use the link below to reset your password:<br><br><a href="${resetPasswordUrl}">${resetPasswordUrl}</a>`,
+    };
+
+    await transporter.sendMail(message);
+
+    res.json({
+      message: 'Password reset email sent',
+    });
   } catch (e) {
     res.status(400).send(e);
   }

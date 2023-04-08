@@ -24,12 +24,18 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/cors": "^2.8.13",
     "@types/jsonwebtoken": "^9.0.1",
+    "@types/maildev": "^0.0.4",
+    "@types/nodemailer": "^6.4.7",
+    "@types/uuid": "^9.0.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.0"
+    "maildev": "^2.0.5",
+    "mongoose": "^7.0.0",
+    "nodemailer": "^6.9.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.54.0",

@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  resetPasswordToken: String,
   posts: [{
     type: mongoose.Schema.Types.ObjectId, // поле с идентификатором для конкретного объекта
     ref: 'Post', // будет ссылаться на эту схему
