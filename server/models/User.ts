@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true, //обезательное поле
+    required: true,
     unique: true,
   },
   password: {
@@ -12,11 +12,11 @@ const UserSchema = new mongoose.Schema({
   },
   resetPasswordToken: String,
   posts: [{
-    type: mongoose.Schema.Types.ObjectId, // поле с идентификатором для конкретного объекта
-    ref: 'Post', // будет ссылаться на эту схему
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post',
   }],
 },
-{timestamps: true}, // добавляем дату, время создания и обновления
+{timestamps: true},
 );
 
 export default mongoose.model('User', UserSchema);
