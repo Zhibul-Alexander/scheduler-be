@@ -9,11 +9,11 @@ import Mail from 'nodemailer/lib/mailer';
 import User from '../models/User.js';
 
 interface MailOptions {
-    from: string;
-    to: string;
-    subject: string;
-    text?: string;
-    html?: string;
+  from: string;
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
 }
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -133,5 +133,27 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     });
   } catch (e) {
     res.status(400).send(e);
+  }
+};
+
+export const forgotPasswordId = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.params;
+
+    const user = await User.findOne({resetPasswordToken: id});
+    if (!user) {
+      return res.status(404).json({error: 'Invalid reset password token'});
+    }
+
+    const {password} = req.body;
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    await user.save();
+
+    return res.status(200).json({message: 'Password reset successful'});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({error: 'Server error'});
   }
 };
